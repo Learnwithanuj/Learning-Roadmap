@@ -933,58 +933,6 @@ function hideTyping() {
   if (t) t.remove();
 }
 
-async function sendMessage() {
-  const input = document.getElementById('chat-input');
-  const btn = document.getElementById('send-btn');
-  const text = input.value.trim();
-  if (!text) return;
-
-  addMsg('user', text);
-  input.value = '';
-  btn.disabled = true;
-  showTyping();
-
-  chatHistory.push({ role: 'user', content: text });
-
-  try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: `Tu "Ghost" hai — ek elite ethical hacker aur AI mentor. Tu Hinglish mein baat karta hai (Hindi + English mix). 
-
-Tera style:
-- Exciting, motivating, aur knowledgeable
-- Technical concepts ko simple examples se explain karta hai
-- Attacker mindset ko ethical perspective se explain karta hai
-- Legal aur ethical hacking pe focus karta hai
-- CTF challenges, labs, aur certifications recommend karta hai
-- Kabhi bhi illegal activities help nahi karta, lekin ethical hacking poori tarah sikhata hai
-
-Topics: Network security, pen testing, web app hacking, OSINT, social engineering, AI in cybersecurity, attacker psychology.
-
-Response short rakh (3-6 lines), engaging aur actionable.`,
-        messages: chatHistory.slice(-10)
-      })
-    });
-
-    const data = await resp.json();
-    const reply = data.content?.[0]?.text || 'Connection lost. Try again bhai.';
-
-    hideTyping();
-    addMsg('ai', reply);
-    chatHistory.push({ role: 'assistant', content: reply });
-  } catch (e) {
-    hideTyping();
-    addMsg('ai', 'Oops, network issue. Try again bhai! 🔌');
-  }
-
-  btn.disabled = false;
-  input.focus();
-}
-
 function sendQuick(text) {
   document.getElementById('chat-input').value = text;
   sendMessage();
